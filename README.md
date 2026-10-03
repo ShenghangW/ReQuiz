@@ -205,6 +205,43 @@ All routes are scoped to the library in the `library_id` cookie.
 | POST | `/api/terms` | Create a term. 400 on validation error, 409 on duplicate |
 | DELETE | `/api/terms/:id` | Delete a term. 404 if not in this library |
 
+<<<<<<< HEAD
+=======
+## Getting started
+
+Requirements: Docker, and Git.
+
+```bash
+git clone https://github.com/zekrever/ReQuiz.git requiz
+cd requiz
+docker compose up --build
+```
+
+Open http://localhost:3000. Node, npm, and Postgres all run inside Docker.
+
+To develop on the host instead (Node 20+):
+
+```bash
+npm install
+cp .env.example .env.local
+docker compose up -d db
+npx prisma migrate dev
+npm run dev
+```
+
+### Environment variables
+
+```
+DATABASE_URL=postgresql://requiz:requiz@localhost:5432/requiz
+```
+
+Never commit `.env.local`.
+
+### Local PostgreSQL
+
+`docker compose up --build` starts Postgres 16 and the Next.js app. Postgres is on port 5432 with user/password/database `requiz`. Stop everything with `docker compose down`.
+
+>>>>>>> 5b3b11f (Add all dependencies to docker)
 ## Deploying
 
 1. Push the repo to GitHub.
