@@ -12,7 +12,7 @@ Built for a hackathon with an education theme: make studying easier.
 - **Add terms (SUBMIT WORD `/submit`):** add a term and a description to your library.
 - **Review (RECORDS `/records`):** browse your library as flip cards (term on the front, description on the back) and delete terms you no longer want.
 
-No login. Each browser gets its own private library, tracked by an anonymous cookie, so one person's terms never appear in another person's quiz. New libraries start with 5 seed terms so the first visit is playable.
+There is no need for login. Each browser gets its own private library, tracked by an anonymous cookie, so one person's terms never appear in another person's quiz. New libraries start with 5 seed terms so the first visit is playable.
 
 ## Installation
 
