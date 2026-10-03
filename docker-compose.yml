@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: requiz
+      POSTGRES_PASSWORD: requiz
+      POSTGRES_DB: requiz
+    ports:
+      - "5432:5432"
+    volumes:
+      - requiz_pg:/var/lib/postgresql/data
+
+volumes:
+  requiz_pg:

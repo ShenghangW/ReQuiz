@@ -42,7 +42,7 @@ No login. Each browser gets its own private library, tracked by an anonymous coo
 |---|---|
 | App | Next.js (App Router) + TypeScript |
 | Styling | Tailwind CSS |
-| Database | PostgreSQL (Neon) |
+| Database | PostgreSQL (local Docker, then Neon) |
 | ORM | Prisma |
 | Hosting | Vercel |
 | Identity | `library_id` cookie (httpOnly, secure, sameSite=lax) |
@@ -79,13 +79,14 @@ All routes are scoped to the library in the `library_id` cookie.
 
 ## Getting started
 
-Requirements: Node 20+, Git, and a PostgreSQL database (a free Neon project works).
+Requirements: Node 20+, Docker (for local Postgres), and Git.
 
 ```bash
-git clone <your-repo-url> requiz
+git clone https://github.com/zekrever/ReQuiz.git requiz
 cd requiz
 npm install
-cp .env.example .env.local     # then set DATABASE_URL
+cp .env.example .env.local
+docker compose up -d
 npx prisma migrate dev
 npm run dev
 ```
@@ -95,16 +96,20 @@ Open http://localhost:3000.
 ### Environment variables
 
 ```
-DATABASE_URL=postgresql://user:password@host/dbname
+DATABASE_URL=postgresql://requiz:requiz@localhost:5432/requiz
 ```
 
 Never commit `.env.local`.
+
+### Local PostgreSQL
+
+`docker compose up -d` starts Postgres 16 on port 5432 with user/password/database `requiz`. Stop it with `docker compose down`.
 
 ## Deploying
 
 1. Push the repo to GitHub.
 2. Import it in Vercel.
-3. Add `DATABASE_URL` under Project Settings, Environment Variables.
+3. Add `DATABASE_URL` under Project Settings, Environment Variables (Neon).
 4. Run `npx prisma migrate deploy` against the production database.
 
 ## Project structure (planned)
