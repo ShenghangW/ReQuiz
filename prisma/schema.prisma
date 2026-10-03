@@ -1,0 +1,31 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Library {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  terms     Term[]
+
+  @@map("libraries")
+}
+
+model Term {
+  id          String   @id @default(uuid()) @db.Uuid
+  libraryId   String   @map("library_id") @db.Uuid
+  library     Library  @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  word        String
+  wordKey     String   @map("word_key")
+  description String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([libraryId, wordKey])
+  @@index([libraryId])
+  @@map("terms")
+}

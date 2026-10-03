@@ -14,9 +14,38 @@ Built for a hackathon with an education theme: make studying easier.
 
 There is no need for a login. Each browser gets its own private library, tracked by an anonymous cookie, so one person's terms never appear in another person's quiz. New libraries start with 5 seed terms so the first visit is playable.
 
-## How to RUN
-Open terminal and run:
-Docker compose up --build
+## How to run
+
+Requirements: Docker.
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:3000. Node, npm, Postgres, Prisma generate, and migrations all run inside Docker. One command is enough.
+
+Stop with `docker compose down`.
+
+To develop on the host instead (Node 20+):
+
+```bash
+npm install
+cp .env.example .env
+docker compose up -d db
+npx prisma migrate deploy
+npm run dev
+```
+
+### Environment variables
+
+```
+DATABASE_URL=postgresql://requiz:requiz@localhost:5432/requiz
+COOKIE_SECURE=false
+```
+
+Never commit `.env`. On Vercel, set `DATABASE_URL` (Neon) and omit `COOKIE_SECURE` so the cookie is Secure on HTTPS.
+
+Local Docker sets `COOKIE_SECURE=false` so the httpOnly `library_id` cookie works on `http://localhost:3000`.
 
 ## Game rules
 
@@ -47,8 +76,9 @@ Docker compose up --build
 | App | Next.js (App Router) + TypeScript |
 | Styling | Tailwind CSS |
 | Database | PostgreSQL (local Docker, then Neon) |
+| ORM | Prisma |
 | Hosting | Vercel |
-| Identity | `library_id` cookie (httpOnly, secure, sameSite=lax) |
+| Identity | `library_id` cookie (httpOnly, sameSite=lax; Secure in production) |
 
 ## Data model
 
@@ -71,7 +101,7 @@ Round state (lives, guesses, revealed chunks) lives in the browser only. Refresh
 
 ## API
 
-All routes are scoped to the library in the `library_id` cookie.
+All routes are scoped to the library in the `library_id` cookie. A missing or unknown cookie creates a new library and inserts the five seed terms.
 
 | Method | Path | Behaviour |
 |---|---|---|
@@ -80,63 +110,28 @@ All routes are scoped to the library in the `library_id` cookie.
 | POST | `/api/terms` | Create a term. 400 on validation error, 409 on duplicate |
 | DELETE | `/api/terms/:id` | Delete a term. 404 if not in this library |
 
-<<<<<<< HEAD
-=======
-## Getting started
-
-Requirements: Docker, and Git.
-
-```bash
-git clone https://github.com/zekrever/ReQuiz.git requiz
-cd requiz
-docker compose up --build
-```
-
-Open http://localhost:3000. Node, npm, and Postgres all run inside Docker.
-
-To develop on the host instead (Node 20+):
-
-```bash
-npm install
-cp .env.example .env.local
-docker compose up -d db
-npx prisma migrate dev
-npm run dev
-```
-
-### Environment variables
-
-```
-DATABASE_URL=postgresql://requiz:requiz@localhost:5432/requiz
-```
-
-Never commit `.env.local`.
-
-### Local PostgreSQL
-
-`docker compose up --build` starts Postgres 16 and the Next.js app. Postgres is on port 5432 with user/password/database `requiz`. Stop everything with `docker compose down`.
-
->>>>>>> 5b3b11f (Add all dependencies to docker)
 ## Deploying
 
 1. Push the repo to GitHub.
 2. Import it in Vercel.
 3. Add `DATABASE_URL` under Project Settings, Environment Variables (Neon).
-4. Apply production migrations against that database when the Prisma layer is in place.
+4. Apply production migrations: `npx prisma migrate deploy` against that database.
 
 ## Project structure
 
 ```
 app/
-  page.tsx              # MAIN: game
-  submit/page.tsx       # SUBMIT WORD
-  records/page.tsx      # RECORDS: flip cards
-  api/terms/...         # route handlers (planned)
+  page.tsx                 # MAIN: game (P3)
+  submit/page.tsx          # SUBMIT WORD (P4)
+  records/page.tsx         # RECORDS (P5)
+  api/terms/route.ts       # GET list, POST create
+  api/terms/random/route.ts
+  api/terms/[id]/route.ts  # DELETE
   components/Nav.tsx
-lib/                    # planned: text + library helpers
-prisma/                 # planned
-docker-compose.yml      # local Postgres 16
-.env.example            # DATABASE_URL template
+lib/                       # domain + Prisma helpers
+prisma/                    # schema and migrations
+docker-compose.yml         # Postgres 16 + Next.js app
+.env.example               # DATABASE_URL template
 ```
 
 ## Seed terms

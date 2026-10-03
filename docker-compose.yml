@@ -16,6 +16,18 @@ services:
       timeout: 5s
       retries: 10
 
+  migrate:
+    build:
+      context: .
+      target: deps
+    command: ["npx", "prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgresql://requiz:requiz@db:5432/requiz
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
   web:
     build:
       context: .
@@ -25,9 +37,13 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://requiz:requiz@db:5432/requiz
+      COOKIE_SECURE: "false"
+      NODE_ENV: production
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   test:
     build:
