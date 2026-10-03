@@ -17,7 +17,9 @@ services:
       retries: 10
 
   web:
-    build: .
+    build:
+      context: .
+      target: runner
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -26,6 +28,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  test:
+    build:
+      context: .
+      target: test
+    profiles: ["test"]
 
 volumes:
   requiz_pg:

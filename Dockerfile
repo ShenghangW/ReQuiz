@@ -6,9 +6,14 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
   npm ci --no-audit --no-fund
 
+FROM deps AS test
+COPY . .
+RUN npm test
+
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=test /app/package.json /tmp/tests-passed
 COPY . .
 ENV NODE_ENV=production
 RUN npm run build
